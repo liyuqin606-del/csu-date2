@@ -515,7 +515,7 @@ async function submitShoot(){
   const email=document.getElementById('shootEmail').value.trim();
   const msg=document.getElementById('shootMsg').value;
   if(!email||!email.includes('@csu.edu.cn')){alert('请输入有效的 @csu.edu.cn 邮箱');return;}
-  if(!localStorage.getItem('csudate_access_token')){
+  if(!window.csudateGetToken || !csudateGetToken()){
     alert('请先使用真实账号登录后再使用 Shoot');
     return;
   }

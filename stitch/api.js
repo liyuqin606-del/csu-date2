@@ -1,11 +1,16 @@
 /**
  * CSU Date 前端 API 工具
- * API 根地址：默认 http://127.0.0.1:8888，可在控制台执行
- * localStorage.setItem('csudate_api_base','https://你的后端域名') 覆盖。
+ * Token：优先 csudate_token（与 login 一致），兼容旧键 csudate_access_token。
+ * API 根：默认 http://127.0.0.1:8888，可 localStorage.setItem('csudate_api_base', url) 覆盖。
  */
 (function () {
-  var KEY_TOKEN = 'csudate_access_token';
+  var KEY_TOKEN = 'csudate_token';
+  var KEY_TOKEN_LEGACY = 'csudate_access_token';
   var KEY_API = 'csudate_api_base';
+
+  window.csudateGetToken = function () {
+    return localStorage.getItem(KEY_TOKEN) || localStorage.getItem(KEY_TOKEN_LEGACY);
+  };
 
   window.CSU_DATE_API_BASE = function () {
     return (localStorage.getItem(KEY_API) || 'http://127.0.0.1:8888').replace(/\/$/, '');
@@ -19,7 +24,7 @@
   window.csudateAuthHeaders = function (jsonBody) {
     var h = {};
     if (jsonBody !== false) h['Content-Type'] = 'application/json';
-    var t = localStorage.getItem(KEY_TOKEN);
+    var t = window.csudateGetToken();
     if (t) h['Authorization'] = 'Bearer ' + t;
     return h;
   };
@@ -32,6 +37,7 @@
     return fetch(url, Object.assign({}, options, { headers: headers })).then(function (res) {
       if (res.status === 401) {
         localStorage.removeItem(KEY_TOKEN);
+        localStorage.removeItem(KEY_TOKEN_LEGACY);
         localStorage.removeItem('csudate_user');
       }
       return res;
@@ -40,6 +46,7 @@
 
   window.csudateLogout = function () {
     localStorage.removeItem(KEY_TOKEN);
+    localStorage.removeItem(KEY_TOKEN_LEGACY);
     localStorage.removeItem('csudate_user');
   };
 
@@ -56,7 +63,7 @@
   };
 
   window.csudateRefreshMe = async function () {
-    if (!localStorage.getItem(KEY_TOKEN)) return null;
+    if (!window.csudateGetToken()) return null;
     var res = await csudateFetch('/api/user/me', { method: 'GET' });
     if (res.status === 401) {
       window.location.href = 'login.html';

@@ -407,7 +407,7 @@ async function togglePause(){
   if(!raw)return;
   const u=JSON.parse(raw);
   const next=!u.paused;
-  if(!localStorage.getItem('csudate_access_token')){
+  if(!window.csudateGetToken || !csudateGetToken()){
     u.paused=next;
     localStorage.setItem('csudate_user',JSON.stringify(u));
     updatePauseUI(next);
@@ -441,7 +441,7 @@ function showWechatEdit(){
 }
 async function saveWechat(){
   const val=document.getElementById('wechatInput').value.trim();
-  if(localStorage.getItem('csudate_access_token')){
+  if(window.csudateGetToken && csudateGetToken()){
     try{
       const res=await csudateFetch('/api/user/wechat',{method:'POST',body:JSON.stringify({wechat:val})});
       const data=await res.json().catch(()=>({}));
@@ -467,7 +467,7 @@ async function saveWechat(){
   renderWechat(val);
 }
 async function clearWechat(){
-  if(localStorage.getItem('csudate_access_token')){
+  if(window.csudateGetToken && csudateGetToken()){
     try{
       const res=await csudateFetch('/api/user/wechat',{method:'POST',body:JSON.stringify({wechat:''})});
       const data=await res.json().catch(()=>({}));

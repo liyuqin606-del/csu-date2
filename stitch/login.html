@@ -367,7 +367,10 @@ function resetSubmitBtn(){
 }
 
 function persistSession(payload){
-  if(payload.access_token) localStorage.setItem('csudate_access_token',payload.access_token);
+  if(payload.access_token){
+    localStorage.setItem('csudate_token',payload.access_token);
+    localStorage.setItem('csudate_access_token',payload.access_token);
+  }
   localStorage.setItem('csudate_user',JSON.stringify(payload.user));
 }
 

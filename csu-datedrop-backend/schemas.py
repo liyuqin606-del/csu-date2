@@ -58,3 +58,7 @@ class ShootRequest(BaseModel):
 
 class PausedRequest(BaseModel):
     paused: bool
+
+
+class RunMatchBody(BaseModel):
+    week_id: Optional[int] = None

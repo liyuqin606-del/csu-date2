@@ -636,9 +636,17 @@ async function submitQuiz(){
     importance:JSON.parse(JSON.stringify(importance)),
     completedAt:Date.now()
   }));
-  if(!localStorage.getItem('csudate_access_token')){
+  const token=typeof csudateGetToken==='function'?csudateGetToken():null;
+  if(!token){
+    alert('请先登录后再提交问卷');
     window.location.href='login.html?redirect='+encodeURIComponent('index.html?startQuiz=true');
     return;
+  }
+  const submitBtn=document.getElementById('btn-m7');
+  const prevText=submitBtn?submitBtn.textContent:'';
+  if(submitBtn){
+    submitBtn.disabled=true;
+    submitBtn.textContent='提交中...';
   }
   try{
     const res=await csudateFetch('/api/quiz/submit',{method:'POST',body:JSON.stringify(quiz)});
@@ -652,6 +660,11 @@ async function submitQuiz(){
   }catch(e){
     console.error(e);
     alert('无法连接服务器，请确认后端已启动');
+  }finally{
+    if(submitBtn){
+      submitBtn.disabled=false;
+      submitBtn.textContent=prevText||'提交问卷 ✓';
+    }
   }
 }
 function resetQuiz(){

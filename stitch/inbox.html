@@ -273,7 +273,7 @@ function renderInboxThreads(threads){
     document.getElementById('topAvatar').querySelector('span').textContent=(u.name&&u.name.charAt(0))||'?';
   }catch(e){window.location.href='login.html';return;}
 
-  if(!localStorage.getItem('csudate_access_token')){
+  if(!window.csudateGetToken || !csudateGetToken()){
     document.getElementById('msgList').innerHTML='<p style="padding:1.25rem;color:var(--text-dim);font-size:.875rem;line-height:1.7">当前为离线演示登录（无 JWT）。请用注册账号登录后即可从服务器加载信箱数据。</p>';
     document.getElementById('emptyState').style.display='none';
     return;

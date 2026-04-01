@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,11 +13,13 @@ from sqlalchemy.orm import Session
 
 from database import engine, get_db
 from models import Base, Crush, Match, Profile, User
+from matcher_service import default_week_id, run_weekly_matching
 from schemas import (
     LoginRequest,
     PausedRequest,
     QuizSubmit,
     RegisterRequest,
+    RunMatchBody,
     ShootRequest,
     WechatUpdateRequest,
 )
@@ -479,3 +481,15 @@ def submit_quiz(
         "user_id": user.id,
         "user": serialize_user(db, user),
     }
+
+
+@app.post("/api/admin/run-match")
+def admin_run_match(
+    body: Optional[RunMatchBody] = None,
+    db: Session = Depends(get_db),
+):
+    """MVP：无鉴权，仅供本地触发周匹配。生产环境务必加管理员校验。"""
+    week_id = default_week_id()
+    if body is not None and body.week_id is not None:
+        week_id = body.week_id
+    return run_weekly_matching(db, week_id)
